@@ -174,6 +174,10 @@ class GUI:
     def send(self, msg):
         self.textCons.config(state=DISABLED)
         while True:
+            self.textCons.config(state = NORMAL)
+            self.textCons.insert(END, self.name+": "+msg+"\n\n") 
+            self.textCons.config(state = DISABLED)
+            self.textCons.see(END)
             message = msg.encode(FORMAT)
             msg_length = len(message)
             send_length = str(msg_length).encode(FORMAT)
