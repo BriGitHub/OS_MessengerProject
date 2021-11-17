@@ -200,7 +200,7 @@ class GUI:
 
                     #print(f"[SERVER] {msg}")
                     self.textCons.config(state = NORMAL)
-                    self.textCons.insert(END, message+"\n\n") 
+                    self.textCons.insert(END, msg+"\n\n") 
                     self.textCons.config(state = DISABLED)
                     self.textCons.see(END)
             except:
