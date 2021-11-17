@@ -1,13 +1,8 @@
-#Author: Andrew Whitinger
-#purpose: create a network to send messages back and forth (combination of server.py and client.py)
-#note: only works for one client
-#import network
-
 import socket
 
 class Network():
     PORT = 2001         #port used for network communication
-    HEADER = 64         #length of message header in bytes
+    HEADER = 256        #length of message header in bytes
     FORMAT = 'utf-8'    #message format
     LOG = True          #true if log messages are to be printed
 
@@ -19,39 +14,39 @@ class Network():
 
     def start_server(self):
         # Initialize server and bind to local ip and port
-        sock.bind((LOCAL_IP, PORT))
+        self.sock.bind((self.LOCAL_IP, self.PORT))
 
         # Allow connections and get a connection from a single client
-        sock.listen()
-        print(LOG * f"[LISTENING] Server is listening on {local_ip}")
+        self.sock.listen()
+        print(self.LOG * f"[LISTENING] Server is listening on {self.local_ip}")
 
-        self.connection, self.client_addr = server.accept()
-        print(LOG * f"[NEW CONNECTION] {addr} connected.")
+        self.connection, self.client_addr = self.server.accept()
+        print(self.LOG * f"[NEW CONNECTION] {self.addr} connected.")
 
     def connect(self, ip):
         # Connect socket to a given host ip
-        sock.connect((ip, port))
-
+        self.sock.connect((ip, self.port))
+        
     def send(self, message):
         # Encode message and determine length
-        formatted_msg = message.encode(FORMAT)              #formatted message
-        message_length = str(len(message)).encode(FORMAT)   #length of message to send
-        message_length += b' ' * (HEADER - len(message_length)) #pad right with blank space
+        formatted_msg = message.encode(self.FORMAT)              #formatted message
+        message_length = str(len(message)).encode(self.FORMAT)   #length of message to send
+        message_length += b' ' * (self.HEADER - len(message_length)) #pad right with blank space
 
         # Send message length, followed by message
-        target = connection if connection else sock         #target to send message to
-            target.send(message_length)
-            target.send(formatted_msg)
+        target = self.connection if self.connection else self.sock         #target to send message to
+        target.send(message_length)
+        target.send(formatted_msg)
 
-        print(LOG * f"[MESSAGE SENT] {message}")
+        print(self.LOG * f"[MESSAGE SENT] {message}")
 
     def receive(self):
         # Receive message length followed by message, and return message
-        sender = connection if connection else sock         #sender that will send message
-        message_length = sender.recv(HEADER).decode(FORMAT)
+        sender = self.connection if self.connection else self.sock         #sender that will send message
+        message_length = sender.recv(self.HEADER).decode(self.FORMAT)
         if message_length:
-            message = sender.recv(int(message_length)).decode(FORMAT)
-            print(LOG * f"[MESSAGE RECEIVED] {message})
+            message = sender.recv(int(message_length)).decode(self.FORMAT)
+            print(self.LOG * f"[MESSAGE RECEIVED] {message}")
 
             return message
         else:

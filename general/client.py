@@ -1,22 +1,17 @@
-#Author: Andrew Whitinger
-#Start a client that connects to a server to send messages between
-
 import socket
 import threading
 
-HEADER = 64 #size of the header in bytes
-PORT = 2001 #router port for the connection
-SERVER = "97.81.156.128"
-# SERVER = "192.168.109.97"
-# SERVER = "xxx.xxx.xxx.xx" #the server's ip to connect to
+HEADER = 64
+PORT = 2001
+# SERVER = "97.81.156.128"
+SERVER = "172.18.144.1"
 ADDR = SERVER, PORT
-FORMAT = 'utf-8' #encoding strings in utf-8 format to send later
-DISCONNECT_MESSAGE = r"/disconnect" #the message to disconnect the client
+FORMAT = 'utf-8'
+DISCONNECT_MESSAGE = r"/disconnect"
 
-client = socket.socket(socket.AF_INET, socket.SOCK_STREAM) #creates the TCP IPV4 server
-client.connect(ADDR) #uses the network connection with to connect to the server
+client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+client.connect(ADDR)
 
-#send: sends a message to the given sever
 def send(msg):
     message = msg.encode(FORMAT)
     msg_length = len(message)
