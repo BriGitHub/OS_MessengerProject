@@ -3,13 +3,11 @@ import threading
 from tkinter import *
 from tkinter import font
 from tkinter import ttk
-
 from message import Message
 
-HEADER = 256
 PORT = 2001
 # SERVER = "97.81.156.128"
-SERVER = "172.18.144.1"
+SERVER = "10.2.81.200"
 ADDR = SERVER, PORT
 FORMAT = 'utf-8'
 DISCONNECT_MESSAGE = r"/disconnect"
@@ -176,23 +174,35 @@ class GUI:
     def send(self, msg):
         self.textCons.config(state=DISABLED)
         while True:
+            message = Message('server', self.name, '', msg)
             self.textCons.config(state = NORMAL)
             self.textCons.insert(END, self.name+": "+msg+"\n\n") 
             self.textCons.config(state = DISABLED)
             self.textCons.see(END)
-            message = msg.encode(FORMAT)
+            
+            #check to see if it is a private message
+            if msg.startswith('/'):
+                #private message
+                split_msg = msg.split()
+                message.msg_type = 'private'
+                message.dest = split_msg[0][1:]
+                split_msg.remove(0)
+                message.content = ' '.join(split_msg)
+
+
+            message.encode(FORMAT)
             msg_length = len(message)
             send_length = str(msg_length).encode(FORMAT)
-            send_length += b' ' * (HEADER - len(send_length))
+            send_length += b' ' * (Message.HEADER - len(send_length))
             client.send(send_length)
             client.send(message)
             break
 
     def goAhead(self, name):
-        message = Message('init', name, '', '')
+        message =  Message('init', name, '', '')
         enc_message = message.encode()
         client.send(enc_message)
-        
+
         self.login.destroy()
         self.layout(name)
          
@@ -203,7 +213,7 @@ class GUI:
     def receive(self):
         while True:
             try:
-                msg_length = client.recv(HEADER).decode(FORMAT)
+                msg_length = client.recv(Message.HEADER).decode(FORMAT)
                 if msg_length:
                     msg_length = int(msg_length)
                     msg = client.recv(msg_length).decode(FORMAT)
