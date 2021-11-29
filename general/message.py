@@ -41,8 +41,3 @@ class Message():
         content = Message.decode_content(enc_content)
         
         return Message(header['type'], header['source'], header['dest'], content)
-        
-        
-msg = Message('private', 'drew', 'edmund', 'whats poppin')
-print(msg.encoded[:Message.HEADER])
-Message.decode_header(msg.encoded[:Message.HEADER])

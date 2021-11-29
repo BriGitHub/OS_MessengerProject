@@ -7,7 +7,7 @@ from message import Message
 
 PORT = 2001
 # SERVER = "97.81.156.128"
-SERVER = "10.2.81.200"
+SERVER = "172.18.144.1"
 ADDR = SERVER, PORT
 FORMAT = 'utf-8'
 DISCONNECT_MESSAGE = r"/disconnect"
@@ -186,16 +186,12 @@ class GUI:
                 split_msg = msg.split()
                 message.msg_type = 'private'
                 message.dest = split_msg[0][1:]
-                split_msg.remove(0)
-                message.content = ' '.join(split_msg)
+                if len(split_msg) > 1:
+                    message.content = ' '.join(split_msg[1:])
+                else:
+                    message.content = ''
 
-
-            message.encode(FORMAT)
-            msg_length = len(message)
-            send_length = str(msg_length).encode(FORMAT)
-            send_length += b' ' * (Message.HEADER - len(send_length))
-            client.send(send_length)
-            client.send(message)
+            client.send(message.encode())
             break
 
     def goAhead(self, name):
@@ -213,14 +209,13 @@ class GUI:
     def receive(self):
         while True:
             try:
-                msg_length = client.recv(Message.HEADER).decode(FORMAT)
-                if msg_length:
-                    msg_length = int(msg_length)
-                    msg = client.recv(msg_length).decode(FORMAT)
+                msg_header = Message.decode_header(client.recv(Message.HEADER))
+                if msg_header['length']:
+                    msg_content = Message.decode_content(client.recv(int(msg_header['length'])))
 
                     #print(f"[SERVER] {msg}")
                     self.textCons.config(state = NORMAL)
-                    self.textCons.insert(END, msg+"\n\n") 
+                    self.textCons.insert(END, msg_header['source']+': '+msg_content+"\n\n") 
                     self.textCons.config(state = DISABLED)
                     self.textCons.see(END)
             except:
