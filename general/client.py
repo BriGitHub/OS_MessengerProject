@@ -215,7 +215,10 @@ class GUI:
 
                     #print(f"[SERVER] {msg}")
                     self.textCons.config(state = NORMAL)
-                    self.textCons.insert(END, msg_header['source']+': '+msg_content+"\n\n") 
+                    if msg_header['type'] == 'private':
+                        self.textCons.insert(END, msg_header['source']+' (private)'+': '+msg_content+"\n\n")
+                    else:
+                        self.textCons.insert(END, msg_header['source']+': '+msg_content+"\n\n")
                     self.textCons.config(state = DISABLED)
                     self.textCons.see(END)
             except:

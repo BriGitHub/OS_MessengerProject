@@ -51,7 +51,7 @@ def handle_messages_from_client(conn, addr, name):
                 if message.msg_type == 'private':
                     if message.dest not in client_inboxes:
                         client_inboxes[message.dest] = Queue()
-                        client_inboxes[message.dest].put(Message('private', name, message.dest, WELCOME_MESSAGE % message.dest))
+                        client_inboxes[message.dest].put(Message('private', 'SERVER', message.dest, WELCOME_MESSAGE % message.dest))
                     client_inboxes[message.dest].put(message)
                 elif message.msg_type == 'server':
                     for client in client_inboxes:
@@ -64,7 +64,6 @@ def handle_messages_from_client(conn, addr, name):
 # handle_messages_to_client: sends queued messages to client
 def handle_messages_to_client(conn, addr, name):
     connected = True
-    client_inboxes[name].put(Message('private', 'admin', name, 'test'))
     while connected:
         message = client_inboxes[name].get()
         conn.send(message.encode())
