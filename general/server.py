@@ -1,6 +1,7 @@
 #Author: Andrew Whitinger
 #Start and host a server that a client can connect to and send messages (literal strings) back and forth
 
+from collections import deque
 import socket
 import threading
 
@@ -12,7 +13,7 @@ FORMAT = 'utf-8' #encoding strings in utf-8 format to send later
 DISCONNECT_MESSAGE = r"/disconnect" #the message to disconnect the client
 
 server = socket.socket(socket.AF_INET, socket.SOCK_STREAM) #creates the TCP IPV4 server
-server.bind(ADDR) #uses the network connection with the server
+client_inboxes = deque()
 
 #handle_client: prints out there was a new connection to the server and gives the host the ip
 #the loop works by using the header for the length of the message and it sends the message over
@@ -39,19 +40,20 @@ def send(conn, msg):
     conn.send(send_length) #send header
     conn.send(message) #send message
 
+#handle_incoming_connections: accept clients as they join
+def handle_incoming_connections():
+    while True:
+        conn, addr = server.accept()
+        thread = threading.Thread(target=handle_client, args=(conn, addr))
+        thread.start()
+        print(f"[ACTIVE CONNECTIONS] {threading.activeCount() - 1}")
+
 #start: tell the server to listen and start the thread for the client
 def start():
+    server.bind(ADDR) #uses the network connection with the server
     server.listen() #start the server
     print(f"[LISTENING] Server is listening on {SERVER}")
-    while True:
-        conn, addr = server.accept() #gets the connection to the server
-        thread = threading.Thread(target=handle_client, args=(conn, addr)) #makes a thread based on the connection
-        thread.start() #start the thread
-        print(f"[ACTIVE CONNECTIONS] {threading.activeCount() - 1}")
-        #this only works for one client because of the while true
-        #each client would need its own thread
-        while True:
-            send(conn, input("Message: "))
+    handle_incoming_connections()
 
 #main: run the server
 def main():

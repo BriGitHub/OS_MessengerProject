@@ -4,7 +4,9 @@ from tkinter import *
 from tkinter import font
 from tkinter import ttk
 
-HEADER = 64
+from message import Message
+
+HEADER = 256
 PORT = 2001
 # SERVER = "97.81.156.128"
 SERVER = "172.18.144.1"
@@ -51,7 +53,7 @@ class GUI:
                              rely = 0.2)
          
         # create a entry box for
-        # tyoing the message
+        # typing the message
         self.entryName = Entry(self.login,
                              font = "Helvetica 14")
          
@@ -187,6 +189,10 @@ class GUI:
             break
 
     def goAhead(self, name):
+        message = Message('init', name, '', '')
+        enc_message = message.encode()
+        client.send(enc_message)
+        
         self.login.destroy()
         self.layout(name)
          
