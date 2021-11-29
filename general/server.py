@@ -5,6 +5,8 @@ from collections import deque
 import socket
 import threading
 
+from message import Message
+
 HEADER = 64 #size of the header in bytes
 PORT = 2001 #router port for the connection
 SERVER = socket.gethostbyname(socket.gethostname()) #gets the user's machine local ip
@@ -13,7 +15,11 @@ FORMAT = 'utf-8' #encoding strings in utf-8 format to send later
 DISCONNECT_MESSAGE = r"/disconnect" #the message to disconnect the client
 
 server = socket.socket(socket.AF_INET, socket.SOCK_STREAM) #creates the TCP IPV4 server
-client_inboxes = deque()
+client_inboxes = dict()
+
+#init_client: handle incoming connection, register client if not already, and start handling messages
+def init_client(conn, addr):
+    conn.recv(Message.)
 
 #handle_client: prints out there was a new connection to the server and gives the host the ip
 #the loop works by using the header for the length of the message and it sends the message over
@@ -44,7 +50,7 @@ def send(conn, msg):
 def handle_incoming_connections():
     while True:
         conn, addr = server.accept()
-        thread = threading.Thread(target=handle_client, args=(conn, addr))
+        thread = threading.Thread(target=init_client, args=(conn, addr))
         thread.start()
         print(f"[ACTIVE CONNECTIONS] {threading.activeCount() - 1}")
 
